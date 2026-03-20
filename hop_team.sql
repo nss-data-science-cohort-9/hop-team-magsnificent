@@ -88,6 +88,9 @@ where npi = 1649269366;
 with primary_code as (
 select npi, 
 		entity_type_code,
+		first_name,
+		last_name,
+		organization_name,
 		address_state_name,
 		case
 			when healthcare_primary_taxonomy_switch_1 in ('Y','X') then healthcare_taxonomy_code_1
@@ -111,29 +114,25 @@ from nppes
 primary_spec as (
 select *
 from primary_code p
-left join nucc n 
+inner join nucc n 
 using(code)
 where p.address_state_name in ('TN', 'Tennessee')
 ),
 from_npis_of_interest as (
-select p.npi
+select p.npi, p.first_name, p.last_name
 from primary_spec p
-inner join hop_team h
-on p.npi = h.from_npi
 -- For the referring providers, filter to Primary Care Physicians (PCPs) only: You can look for classifications of "Family Medicine", "Internal Medicine", "Pediatrics", and "General Practice".
 where classification in ('Family Medicine', 'Internal Medicine', 'Pediatrics', 'General Practice')
 and entity_type_code = 1
 ),
 to_npis_of_interest as (
-select p.npi
+select p.npi, p.organization_name 
 from primary_spec p
-inner join hop_team h
-on p.npi = h.to_npi
 -- For the receiving providers, filter to hospitals.
 where grouping ilike '%hospital%'
 and entity_type_code = 2
 )
-select h.from_npi, h.to_npi, h.patient_count, h.transaction_count, h.average_day_wait, h.std_day_wait
+select h.from_npi, f.first_name || ' ' || f.last_name as providername, h.to_npi, t.organization_name, h.patient_count, h.transaction_count, h.average_day_wait, h.std_day_wait
 from hop_team h
 inner join from_npis_of_interest f
 on h.from_npi = f.npi
@@ -142,8 +141,6 @@ on h.to_npi = t.npi
 -- To avoid incidental or low-volume referrals, look for significant referral relationships, meaning transaction_count >= 50 and avg_day_wait < 5
 where h.transaction_count >= 50
 and h.average_day_wait < 50;
-
--- adjust from_npis_of_interest and to_npis_of_interest to return provider and hospital names too
 
 
 
