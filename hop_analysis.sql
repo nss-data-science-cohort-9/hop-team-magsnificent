@@ -61,6 +61,45 @@ select npi, case
 			end as primary_taxonomy_code
 from nppes;
 
+WITH primary_taxonomy AS(
+select npi, case
+				when healthcare_primary_taxonomy_switch_1 in ('Y','X') then healthcare_taxonomy_code_1
+				when healthcare_primary_taxonomy_switch_2 in ('Y','X') then healthcare_taxonomy_code_2
+				when healthcare_primary_taxonomy_switch_3 in ('Y','X') then healthcare_taxonomy_code_3
+				when healthcare_primary_taxonomy_switch_4 in ('Y','X') then healthcare_taxonomy_code_4
+				when healthcare_primary_taxonomy_switch_5 in ('Y','X') then healthcare_taxonomy_code_5
+				when healthcare_primary_taxonomy_switch_6 in ('Y','X') then healthcare_taxonomy_code_6
+				when healthcare_primary_taxonomy_switch_7 in ('Y','X') then healthcare_taxonomy_code_7
+				when healthcare_primary_taxonomy_switch_8 in ('Y','X') then healthcare_taxonomy_code_8
+				when healthcare_primary_taxonomy_switch_9 in ('Y','X') then healthcare_taxonomy_code_9
+				when healthcare_primary_taxonomy_switch_10 in ('Y','X') then healthcare_taxonomy_code_10
+				when healthcare_primary_taxonomy_switch_11 in ('Y','X') then healthcare_taxonomy_code_11
+				when healthcare_primary_taxonomy_switch_12 in ('Y','X') then healthcare_taxonomy_code_12
+				when healthcare_primary_taxonomy_switch_13 in ('Y','X') then healthcare_taxonomy_code_13
+				when healthcare_primary_taxonomy_switch_14 in ('Y','X') then healthcare_taxonomy_code_14
+				when healthcare_primary_taxonomy_switch_15 in ('Y','X') then healthcare_taxonomy_code_15
+			end as primary_taxonomy_code
+FROM nppes
+),
+
+
+npi_primary_code AS(
+SELECT *
+FROM primary_taxonomy p
+INNER JOIN NPPES n
+ON p.npi = n.npi
+)
+
+
+SELECT *
+FROM npi_primary_code npip
+JOIN zip_cbsa c 
+ON LEFT(npip.address_postal_code::TEXT, 5) = c.zipcode::TEXT
+
+
+
+
+
 SELECT *
 FROM zip_cbsa
 WHERE usps_zip_pref_city = 'NASHVILLE';
