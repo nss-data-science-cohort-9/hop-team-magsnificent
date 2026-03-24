@@ -123,3 +123,58 @@ INNER JOIN hospitals th
 ON ht.to_npi = th.npi
 WHERE ht.transaction_count >= 50
 AND ht.average_day_wait < 50;
+
+
+-- Identify PCPs who refer patients and the distribution
+-- of their referrals across major hospitals.
+
+SELECT 
+	provider_name,
+    provider_classification,
+    hospital_organization_name,
+    hospital_address_city_name,
+    SUM(transaction_count) AS total_referrals,
+    SUM(patient_count) AS total_patients,
+    AVG(average_day_wait) AS avg_wait_days
+FROM nashville_pcp_hospital_referrals_mv
+GROUP BY
+    provider_name,
+    provider_classification,
+    hospital_organization_name,
+    hospital_address_city_name
+ORDER BY 
+	total_referrals DESC;
+
+-- Find PCPs who refer few or no patients to 
+-- Vanderbilt but send patients to competitor hospitals.
+
+SELECT
+    provider_name,
+    provider_classification,
+    hospital_organization_name,
+    SUM(transaction_count) AS total_referrals
+FROM nashville_pcp_hospital_referrals_mv
+WHERE hospital_organization_name NOT ILIKE '%vanderbilt%'
+AND npi_providers NOT IN (
+    SELECT npi_providers
+    FROM nashville_pcp_hospital_referrals_mv
+    WHERE hospital_organization_name ILIKE '%vanderbilt%')
+GROUP BY
+    provider_name,
+    provider_classification,
+    hospital_organization_name
+ORDER BY total_referrals DESC;
+
+-- Aggregate by PCP specialty to understand which specialties
+-- are underrepresented in Vanderbilt’s referral network.
+
+SELECT
+    provider_classification AS pcp_specialty,
+    SUM(transaction_count) AS total_referrals
+FROM nashville_pcp_hospital_referrals_mv
+WHERE hospital_organization_name NOT ILIKE '%vanderbilt%'
+GROUP BY provider_classification
+ORDER BY total_referrals DESC;
+
+
+
