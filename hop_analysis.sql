@@ -176,5 +176,16 @@ WHERE hospital_organization_name NOT ILIKE '%vanderbilt%'
 GROUP BY provider_classification
 ORDER BY total_referrals DESC;
 
+-- Visualize top referring PCPs and their referall patterns
 
+CREATE MATERIALIZED VIEW pcp_referral_count_mv AS
 
+SELECT 
+    provider_name,
+    provider_classification,
+    SUM(transaction_count) AS total_referrals
+FROM nashville_pcp_hospital_referrals_mv
+GROUP BY
+    provider_name,
+    provider_classification
+ORDER BY total_referrals DESC;
