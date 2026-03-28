@@ -4,7 +4,7 @@ import folium
 from streamlit_folium import st_folium
 import utils
 
-st.set_page_config(page_title="Referral Community Geolocator")
+st.header("Referral Community Geolocator")
 
 referral_data = utils.hop_team_nashville_df
 
