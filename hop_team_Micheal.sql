@@ -1,10 +1,3 @@
-Select npi 
-from nppes;
-
-select from_npi, to_npi
-from hop_team;
-
-
 
 
 
@@ -65,7 +58,7 @@ where grouping ilike '%hospital%'
 and entity_type_code = 2
 )
 Select h.from_npi, 
-		pcp.first_name || '' || pcp.last_name as Provider,
+		pcp.first_name || ' ' || pcp.last_name as Provider,
 		h.to_npi,
 		f.organization_name,
 		h.patient_count, 
@@ -78,7 +71,7 @@ inner join to_npi_facilities f on h.to_npi = f.npi
 where h.transaction_count >= 50 
 and average_day_wait < 50;
 		
+DROP MATERIALIZED VIEW TN_REFERRAL_NETWORK
 
-	
 
 
