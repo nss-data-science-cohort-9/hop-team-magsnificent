@@ -9,15 +9,15 @@ import utils
 
 st.set_page_config(layout="wide")
 
-pcp_specialization_selectbox = st.sidebar.selectbox(
-    label='PCP Specialization',
-    options=utils.pcp_specialization_list
-)
+# pcp_specialization_selectbox = st.sidebar.selectbox(
+#     label='PCP Specialization',
+#     options=utils.pcp_specialization_list
+# )
 
-hospital_selectbox = st.sidebar.selectbox(
-    label='Hospital',
-    options=utils.hospital_list
-)
+# hospital_selectbox = st.sidebar.selectbox(
+#     label='Hospital',
+#     options=utils.hospital_list
+# )
 
 hop = utils.hop_team_nashville_df
 
@@ -26,6 +26,13 @@ st.title('Analysis', text_alignment='center')
 #-------------------------------------------------
 
 st.header('Hospital Patient Share')
+
+st.markdown(
+    '''
+    * The following tree map shows the distribution of patients being referred to organizations.
+    * Any institutions under the same umbrella were combined.
+    '''
+)
 
 hop['organization_name'] = hop['organization_name'].str.replace(r'SAINT THOMAS.*', 'SAINT THOMAS', regex=True)
 hop['organization_name'] = hop['organization_name'].str.replace(r'MAURY REGIONAL.*', 'MAURY REGIONAL', regex=True)
@@ -104,29 +111,49 @@ st.markdown(
     '''
 )
 
-#-------------------------------------------------
-
-pcp_specialization_selectbox
-hospital_selectbox
+st.space('small')
 
 #-------------------------------------------------
 
-pcp_patient_count = hop.groupby("classification")["patient_count"].sum().reset_index()
+# if pcp_specialization_selectbox == 'Any':
+#     px.bar(
+#         data_frame=utils.hospital_specialization_referrals,
+#         x='specialization'
+#     )
 
-fig = px.bar(
-    pcp_patient_count,                         
-    x="classification",          
-    y="patient_count"
-)
+# if hospital_selectbox == 'All':
+#     px.bar(
+#         data_frame=utils.hop_team_nashville_df,
+#         x='organization_name'
+#     )
 
-fig.update_layout(
-    xaxis_title="Provider Classification",
-    yaxis_title="Total Referrals"
-)
+# hospital_specialization_referrals = (
+#     utils.hop_team_nashville_df
+#         .groupby(['organization_name', 'specialization'])['transaction_count']
+#         .agg(
+#             ['min', 'max']
+#         )
+# )
+# hospital_specialization_referrals
 
-fig.update_traces(marker_color='#2d7a48')
+#-------------------------------------------------
 
-st.plotly_chart(fig, use_container_width=True)  
+# pcp_patient_count = hop.groupby("classification")["patient_count"].sum().reset_index()
+
+# fig = px.bar(
+#     pcp_patient_count,                         
+#     x="classification",          
+#     y="patient_count"
+# )
+
+# fig.update_layout(
+#     xaxis_title="Provider Classification",
+#     yaxis_title="Total Referrals"
+# )
+
+# fig.update_traces(marker_color='#2d7a48')
+
+# st.plotly_chart(fig, use_container_width=True)  
 
 #-------------------------------------------------
 
