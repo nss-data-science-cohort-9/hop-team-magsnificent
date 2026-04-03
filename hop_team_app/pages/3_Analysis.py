@@ -67,3 +67,27 @@ fig.update_traces(texttemplate='%{label}<br>%{value:.1f}%',
                    )
 
 st.plotly_chart(fig, use_container_width=True)  
+
+st.header("Average wait time vs. Number of Patients")
+
+st.markdown("Let's take a look at efficiency in care are based on patient count and average wait times.")
+
+
+hop = utils.hop_team_nashville_df
+hop_pc = hop.groupby("provider_community").agg({'patient_count': 'mean', 'average_day_wait': 'mean'}).reset_index()
+hop_sp = hop.groupby("specialization").agg({'patient_count': 'mean', 'average_day_wait': 'mean'}).reset_index()
+fig = px.scatter(
+    hop_pc, 
+    x="patient_count",
+    y="average_day_wait",
+    #color="specialization_cleaned",
+    size="patient_count",
+    hover_name="provider_community"
+    #hover_data=["provider_community"]
+
+)
+
+st.plotly_chart(fig, use_container_width=True);
+
+
+
